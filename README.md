@@ -1,4 +1,4 @@
-# flask-docker-backend-stack
+# Flask + Docker: Backend stack
 Backend stack preconfigurado utilizando como herramientas principales: Python, Flask, Docker, Docker Compose, Postgres, PgAdmin, Swagger.
 
 El servicio principal del proyecto (**flask-app**) está configurado en base a la imagen de Docker: [tiangolo/uwsgi-nginx-flask](https://hub.docker.com/r/tiangolo/uwsgi-nginx-flask/) y la estructura general del backend tiene como referencia al proyecto: [tiangolo/full-stack](https://github.com/tiangolo/full-stack).
@@ -119,3 +119,7 @@ docker-compose up -d
 ```bash
 docker-compose exec flask-app bash
 ```
+
+## License
+
+Este proyecto está licenciado bajo los términos de la licencia MIT.
