@@ -1,0 +1,40 @@
+version: '2'
+services:
+
+  db:
+    image: postgres:10
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: JpELH7HYnPnYjsz5
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - backend-stack-db-data:/var/lib/postgresql/data/pgdata
+
+  pgadmin:
+    image: fenglc/pgadmin4
+    depends_on:
+      - db
+    environment:
+      - DEFAULT_USER=admin
+      - DEFAULT_PASSWORD=9xLykPSPMpAD7GFC
+
+  flask-app:
+    image: 'backend-stack/flask-app'
+    depends_on:
+      - db
+    environment:
+      - ENV=prod
+    volumes:
+      - backend-stack-flask-app-data:/app-data
+
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    depends_on:
+      - flask-app
+    environment:
+      - API_URL=http://api.{{MY-DOMAIN}}/v1/swagger/
+
+volumes:
+  backend-stack-db-data:
+  backend-stack-flask-app-data:

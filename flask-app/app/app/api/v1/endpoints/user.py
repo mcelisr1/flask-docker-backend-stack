@@ -31,7 +31,7 @@ from app.schemas.user import UserSchema
 @use_kwargs({
     'email': fields.Email(required=True),
     'password': fields.String(required=True),
-    'first_name': fields.Email(required=False),
+    'first_name': fields.String(required=False),
     'last_name': fields.String(required=False)
 })
 @marshal_with(UserSchema())
