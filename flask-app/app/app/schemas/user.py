@@ -6,6 +6,7 @@
 from marshmallow import fields
 # Import app code
 from .base import BaseSchema
+from .role import RoleSchema
 
 
 class UserSchema(BaseSchema):
@@ -14,3 +15,8 @@ class UserSchema(BaseSchema):
     first_name = fields.String()
     last_name = fields.String()
     is_active = fields.Boolean()
+    is_superuser = fields.Boolean()
+
+    # Relationships
+    role_id = fields.Integer()
+    role = fields.Nested(RoleSchema)

@@ -44,7 +44,7 @@ def route_login_access_token_post(
     if not correct_password:
         abort(400, 'Incorrect password.')
 
-    if not user_provider.is_active(user=user_obj):
+    if not user_obj.is_active:
         abort(400, 'The user is inactive in the system.')
 
     return token_provider.generate_tokens(user_obj.id)

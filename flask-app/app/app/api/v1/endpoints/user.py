@@ -3,15 +3,13 @@
 # Import installed packages
 from flask import abort
 from flask_apispec import doc, use_kwargs, marshal_with
+from flask_jwt_extended import get_current_user
 from flask_jwt_extended import jwt_required
 from webargs import fields
 
 # Import app code
 from app.api.v1.api_docs import docs
-from app.api.v1.utils.general import datetime_now
 from app.core import data
-from app.core.db.session import db_session
-from app.core.security import pwd_context
 from app.main import app
 
 # Import providers
@@ -21,13 +19,10 @@ from app.providers import user_provider
 from app.schemas.msg import MsgSchema
 from app.schemas.user import UserSchema
 
-# Import required models
-from app.models.user import User
-
 
 @docs.register
 @doc(
-    description='Create a new user in the system.',
+    description='Create a new user with default role in the system.',
     tags=['users'])
 @app.route(
     f'{data.V1_STR}/users',
@@ -35,47 +30,58 @@ from app.models.user import User
 )
 @use_kwargs({
     'email': fields.Email(required=True),
-    'password': fields.String(required=True)
+    'password': fields.String(required=True),
+    'first_name': fields.Email(required=False),
+    'last_name': fields.String(required=False)
 })
 @marshal_with(UserSchema())
 def route_users_post(
     email=None,
-    password=None
+    password=None,
+    first_name=None,
+    last_name=None
 ):
     user_obj = user_provider.get_by_email(email=email)
     if user_obj is not None:
         abort(400, 'The email to register already exists in the system.')
 
-    new_user_obj = User(
-        created_at=datetime_now(),
+    return user_provider.create(
         email=email,
-        password=pwd_context.hash(password)
+        password=password,
+        first_name=first_name,
+        last_name=last_name
     )
-    db_session.add(new_user_obj)
-    db_session.commit()
-
-    return new_user_obj
 
 
 @docs.register
 @doc(
-    description='Read existing users in the system.',
+    description='Read existing users in the system.'
+                ' * Authentication required.',
     tags=['users'])
 @app.route(
     f'{data.V1_STR}/users',
     methods=['GET']
 )
 @marshal_with(UserSchema(many=True))
+@jwt_required
 def route_users_get():
+    current_user = get_current_user()
+
+    if not current_user.is_active:
+        abort(403, 'Inactive user.')
+    elif not user_provider.has_role_code(
+        user_obj=current_user,
+        role_code=data.ROLE_DEFAULT
+    ):
+        abort(403, "Not authorized")
+
     return user_provider.get_all()
 
 
 @docs.register
 @doc(
-    description='{} {}'.format(
-        'Update a user by id in the system.',
-        '* Authentication required.'
-    ),
+    description='Update a user by id in the system.'
+                ' * Authentication required.',
     tags=['users'])
 @app.route(
     f'{data.V1_STR}/users/<int:id>',
@@ -98,12 +104,19 @@ def route_users_put_by_id(
     last_name=None,
     is_active=None
 ):
+    current_user = get_current_user()
+
+    if not current_user.is_active:
+        abort(403, 'Inactive user.')
+    elif not current_user.is_superuser:
+        abort(403, "Only a superuser can execute this action.")
+
     user_obj = user_provider.get_by_id(id=id)
     if user_obj is None:
         abort(400, 'The user to update doesn\'t exist in the system.')
 
     updated_user_obj = user_provider.update(
-        user=user_obj,
+        user_obj=user_obj,
         email=email,
         password=password,
         first_name=first_name,
@@ -131,10 +144,17 @@ def route_users_put_by_id(
 def route_users_delete_by_id(
     id=None
 ):
+    current_user = get_current_user()
+
+    if not current_user.is_active:
+        abort(403, 'Inactive user.')
+    elif not current_user.is_superuser:
+        abort(403, "Only a superuser can execute this action.")
+
     user_obj = user_provider.get_by_id(id=id)
     if user_obj is None:
         abort(400, 'The user to delete doesn\'t exist in the system.')
 
-    user_provider.delete(user=user_obj)
+    user_provider.delete(user_obj=user_obj)
 
     return {'msg': 'User successfully removed from the system.'}

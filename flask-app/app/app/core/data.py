@@ -10,6 +10,8 @@ ACCESS_TOKEN_EXPIRE_MINUTES = timedelta(
 DATA_ROOT_PATH = '/app-data'
 DEBUG = True
 ENV = os.getenv("ENV")
+FIRST_SUPERUSER = 'super.user@backend-stack.com'
+FIRST_SUPERUSER_PASSWORD = 'Ay6BM9qgHEd6de3T'
 FLASK_DEBUG = 1
 POSTGRES_DB = 'app'
 POSTGRES_PASSWORD = 'JpELH7HYnPnYjsz5'
@@ -18,6 +20,7 @@ POSTGRES_USER = 'admin'
 REFRESH_TOKEN_EXPIRE_MINUTES = timedelta(
     minutes=90
 )
+ROLE_DEFAULT = 'default'
 SECRET_KEY = 'B9yggMGjj54D6nLrgdb9TgyP'
 SQLALCHEMY_DATABASE_URI = (
     'postgresql://{}:{}@{}/{}'.format(

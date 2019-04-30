@@ -8,6 +8,9 @@ from app.core import config  # noqa
 # Set up flask db session
 from app.core.db.session import db_session  # noqa
 
+# Load dafault data on DB
+from app.core.db.init_db import load_default_data
+
 # Set up CORS
 from . import cors  # noqa
 
@@ -16,3 +19,9 @@ from . import errors  # noqa
 
 # Set up Flask Endpoints
 from ..api.v1 import api as api_v1  # noqa
+
+
+@app.before_first_request
+def setup():
+    # Load dafault data on DB
+    load_default_data()
