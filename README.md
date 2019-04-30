@@ -97,28 +97,11 @@ Servidor con Docker, Docker Compose, GIT y Rancher (Versión: `v1.6.21` para est
 ```bash
 docker-compose build
 ```
-* 
+* Crea un nuevo stack en rancher
+* Copia y pega el contenido del archivo `docker-compose.rancher.yml` en el cuadro de texto **Optional: docker-compose.yml**.
+* Haz clic en el botón crear.
 
-
-* Actualiza tu archivo `hosts` local, modifica la IP `127.0.0.1` (tu `localhost`) a `dev.api.backend-stack.com`. El archivo `docker-compose.override.yml` utiliza ese dominio para desplegar la documentación en **Suagger-UI**.
-
-```
-127.0.0.1    dev.api.backend-stack.com
-```
-
-...eso hará que tu navegador ejecute la app en ese dominio de manera local.
-
-* Inicia el stack con Docker Compose:
-
-```bash
-docker-compose up -d
-```
-
-* Inicia una sesión interactiva en el contenedor de **flask-app**, por defecto en local solo ejecuta un loop infinito que no hace nada:
-
-```bash
-docker-compose exec flask-app bash
-```
+**Nota**: Si quieres acceder a los servicios puedes exponer un puerto público hacia el puerto interno o crear un acceso por dominio con un Load Balancer.
 
 ## License
 
